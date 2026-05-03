@@ -2,7 +2,7 @@
 
 > **"Happiness is the foundation. Freedom is the ultimate goal."**
 
-![V8.3 Empire Banner](assets/v8.3-banner.png)
+![V8.3 Empire Banner](colored-square-header.jpg)
 
 ---
 
