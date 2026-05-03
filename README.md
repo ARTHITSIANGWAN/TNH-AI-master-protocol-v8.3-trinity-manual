@@ -8,22 +8,9 @@
 
 ## 🛡️ SYSTEM ARCHITECTURE: THN-V8.3 TRINITY
 
-<div style="background:#111; padding:12px; border-radius:8px; margin:20px 0;">
-  <table style="width:100%; border-collapse:collapse;">
-    <tr>
-      <td style="background:#555; color:white; text-align:center; padding:12px; font-weight:bold;">GO ENGINE</td>
-      <td style="background:#00AEEF; color:white; text-align:center; padding:12px; font-weight:bold;">GO</td>
-      <td style="background:#666; color:white; text-align:center; padding:12px; font-weight:bold;">ARCH</td>
-      <td style="background:#00C853; color:white; text-align:center; padding:12px; font-weight:bold;">ZERO-GARBAGE</td>
-    </tr>
-    <tr>
-      <td style="background:#555; color:white; text-align:center; padding:12px; font-weight:bold;">SECURITY</td>
-      <td style="background:#E53935; color:white; text-align:center; padding:12px; font-weight:bold;">DARK-RELAY</td>
-      <td style="background:#666; color:white; text-align:center; padding:12px; font-weight:bold;">LATENCY</td>
-      <td style="background:#FFEB3B; color:#000; text-align:center; padding:12px; font-weight:bold;">0.XXMS</td>
-    </tr>
-  </table>
-</div>
+| **ENGINE**       | **ARCH**     | **ZERO-GARBAGE** | **SECURITY**     | **DARK-RELAY**   | **LATENCY**    |
+|------------------|--------------|------------------|------------------|------------------|----------------|
+| 🔴 **V8.3**      | 🟢 **Trinity** | 🟡 **Pure Go**   | 🔵 **HMAC-SHA256** | 🟣 **Stegano**   | 🟠 **0.16ms**  |
 
 ---
 
