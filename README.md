@@ -6,7 +6,7 @@
 
 ---
 
-## 🛡️ SYSTEM ARCHITECTURE: THN-V8.3 TRINITY
+## 🛡️ SYSTEM ARCHITECTURE: TNH-V8.3 TRINITY
 
 | **ENGINE**       | **ARCH**       | **ZERO-GARBAGE**     | **SECURITY**       | **DARK-RELAY**     | **LATENCY**    |
 |------------------|----------------|----------------------|--------------------|--------------------|----------------|
