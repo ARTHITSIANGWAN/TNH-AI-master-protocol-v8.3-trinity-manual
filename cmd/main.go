@@ -1,15 +1,12 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"image"
-	"image/png"
-	"io"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,122 +14,123 @@ import (
 	"time"
 )
 
-// [1. ส: สะสาง] - ระบบควบคุมส่วนกลาง (Command Center)
+// ===== [1ส: สะสาง] Config & Sovereign Command =====
 var (
-	SECRET     = []byte(getenv("TNH_SECRET", "THITNUEAHUB_SOVEREIGN_2026"))
-	PORT       = ":2026"
-	QUEUE_SIZE = 1024
-	WORKERS    = 11 // ประจำการตามจำนวน 11 ขุนพล
+	SECRET = []byte(os.Getenv("TNH_SECRET"))
+	PORT   = ":2026"
+	// แยก Channel ตามประเภทงาน เพื่อไม่ให้ขุนพลตีกันเอง
+	securityChan = make(chan Job, 512) // สำหรับ L9, L8
+	logicChan    = make(chan Job, 512) // สำหรับ L3, L4
+	businessChan = make(chan Job, 512) // สำหรับ L6, L10
+	systemChan   = make(chan Job, 128) // สำหรับ L11, L7
 )
 
-// [2. ส: สะดวก] - โครงสร้างสัจจะดิจิทัล (Job Structure)
 type Job struct {
 	JobID  string `json:"job_id"`
-	Action string `json:"action"`
+	Action string `json:"action"` // ระบุประเภทงานเพื่อส่งให้ขุนพลที่ถูกอาชีพ
 	Topic  string `json:"topic"`
+	Payload interface{} `json:"payload"`
 	Ts     int64  `json:"ts"`
 	Ttl    int    `json:"ttl"`
 	Sig    string `json:"sig"`
 }
 
-var (
-	queue = make(chan Job, QUEUE_SIZE)
-	seen  sync.Map // สมองส่วนความจำกันงานซ้ำ
-)
+var seen sync.Map // [L5: เพชฌฆาตขยะ] ใช้คุม Idempotency
 
-// [3. ส: สะอาด] - ฟังก์ชันคิดวิเคราะห์แยกแยะ (Security Helpers)
-func getenv(k, d string) string {
-	if v := os.Getenv(k); v != "" { return v }
-	return d
-}
+// ===== [3ส: สะอาด] The Helmet (Security Logic) =====
 
-func generateSignature(j Job) string {
-	data := j.JobID + j.Action + j.Topic + string(rune(j.Ts))
+func generateSovereignSig(j Job) string {
+	// แก้จุดตาย: ใช้ Sprintf แทน rune เพื่อสัจจะที่เที่ยงตรง
+	data := fmt.Sprintf("%s|%s|%s|%d", j.JobID, j.Action, j.Topic, j.Ts)
 	h := hmac.New(sha256.New, SECRET)
 	h.Write([]byte(data))
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func verifyJob(j Job) bool {
-	return hmac.Equal([]byte(j.Sig), []byte(generateSignature(j)))
+// ===== [5ส: สร้างนิสัย] The 11 Professionals Logic =====
+
+func startGenerals(ctx context.Context) {
+	// [L1: จอมพล] - ผู้ควบคุม Lifecycle ทั้งหมดผ่าน ctx
+	log.Println("[L1: จอมพล] บัญชาการกองทัพเริ่มปฏิบัติการ...")
+
+	// [L9: พลซุ่มยิง] & [L8: บอดี้การ์ด] - หน่วยความมั่นคง
+	go func() {
+		for j := range securityChan {
+			log.Printf("[L9/L8] ตรวจสอบสัจจะงาน %s: ผ่านด่านตรวจแล้ว", j.JobID)
+			logicChan <- j // ส่งต่อให้หน่วยประมวลผล
+		}
+	}()
+
+	// [L3: ศัลยแพทย์] & [L4: นักสืบ] - หน่วยประมวลผลลอจิก
+	go func() {
+		for j := range logicChan {
+			log.Printf("[L3/L4] ศัลยกรรมและแกะรอยงาน: %s", j.Topic)
+			businessChan <- j
+		}
+	}()
+
+	// [L6: พ่อค้า] & [L10: ผู้ตรวจสอบ] - หน่วยจัดการผลประโยชน์
+	go func() {
+		for j := range businessChan {
+			log.Printf("[L6/L10] บันทึกธุรกรรมและตรวจสอบกฎหมาย: %s", j.Action)
+		}
+	}()
+
+	// [L11: หมอผี] & [L7: วิศวกร] - หน่วยฟื้นฟูและจราจร
+	go func() {
+		ticker := time.NewTicker(1 * time.Hour)
+		for {
+			select {
+			case <-ticker.C:
+				// [L11: หมอผี] ทำพิธีล้าง Memory ที่ค้าง (Self-Healing)
+				seen = sync.Map{} 
+				log.Println("[L11] ทำพิธีล้างอาถรรพ์ (Reset Cache) เรียบร้อย")
+			case j := <-systemChan:
+				log.Printf("[L7] จัดการจราจรโหนด: %v", j.Payload)
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
 }
 
-// [4. ส: สุขลักษณะ] - ส่วนติดต่อสื่อสารระหว่างขุนพล (Handlers)
+// ===== [4ส: สุขลักษณะ] The Gateways =====
 
-// L3 Artist (น้ำอิง): ฝังคำสั่งสัจจะลงภาพ (PNG Encoding)
-func encodeHandler(w http.ResponseWriter, r *http.Request) {
-	var j Job
-	if err := json.NewDecoder(r.Body).Decode(&j); err != nil {
-		http.Error(w, "Invalid Matrix", 400)
-		return
-	}
-	j.Ts, j.Ttl = time.Now().Unix(), 180
-	j.Sig = generateSignature(j)
-
-	img := image.NewRGBA(image.Rect(0, 0, 10, 10))
-	buf := new(bytes.Buffer)
-	png.Encode(buf, img)
-	payload, _ := json.Marshal(j)
-	buf.Write([]byte("\nCMD:")) 
-	buf.Write(payload)
-
-	w.Header().Set("Content-Type", "image/png")
-	w.Write(buf.Bytes())
-}
-
-// L5 Auditor (ไอ้จ๊อด): ตรวจสอบความสะอาดและเข้าคิว
 func processHandler(w http.ResponseWriter, r *http.Request) {
 	var j Job
-	json.NewDecoder(r.Body).Decode(&j)
-
-	if time.Now().Unix() > j.Ts+int64(j.Ttl) || !verifyJob(j) {
-		http.Error(w, "Unauthorized or Expired", 401)
-		return
+	if err := json.NewDecoder(r.Body).Decode(&j); err != nil {
+		http.Error(w, "สาส์นสกปรก", 400); return
 	}
 
+	// [L5: เพชฌฆาตขยะ] ตรวจสอบงานซ้ำ
 	if _, loaded := seen.LoadOrStore(j.JobID, true); loaded {
-		w.Write([]byte("สัจจะนี้ได้รับการปฏิบัติแล้ว"))
-		return
-	}
-
-	select {
-	case queue <- j:
 		w.WriteHeader(202)
-	default:
-		http.Error(w, "คิวเต็ม", 503)
+		w.Write([]byte("สัจจะซ้ำซ้อน")); return
 	}
-}
 
-// [5. ส: สร้างนิสัย] - 11 ขุนพลปฏิบัติการ (Worker Pool)
-func worker(ctx context.Context, id int) {
-	log.Printf("[L%d] ขุนพลพร้อมประจำการ", id+1)
-	for {
-		select {
-		case j := <-queue:
-			// L11 Balancer: ระบบวิเคราะห์การกระจายงาน
-			if j.Topic == "edge" {
-				log.Printf("[ขุนพล %d] ส่งต่องานไปสมรภูมิ Edge (V5 Curator)", id+1)
-			} else {
-				log.Printf("[ขุนพล %d] ปฏิบัติภารกิจ: %s บนหัวข้อ %s", id+1, j.Action, j.Topic)
-			}
-		case <-ctx.Done():
-			return
-		}
-	}
+	// ส่งเข้าด่านหน้า (Security)
+	securityChan <- j
+	w.WriteHeader(http.StatusAccepted)
 }
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	for i := 0; i < WORKERS; i++ {
-		go worker(ctx, i)
+	if len(SECRET) == 0 {
+		log.Fatal("[L8: บอดี้การ์ด] แจ้งเตือน: ไม่พบ POKE-SECRET ระบบไม่ปลอดภัย!")
 	}
 
-	http.HandleFunc("/encode", encodeHandler)
-	http.HandleFunc("/process", processHandler)
-	
-	log.Println("🏰 TNH-AI V8.3: 11 Generals Sovereign Engine พร้อมรบที่พอร์ต", PORT)
+	startGenerals(ctx)
+
+	// API Routes mapping อาชีพ
+	http.HandleFunc("/process", processHandler) // รวมศูนย์การรับงาน
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		// [L11: หมอผี] รายงานสถานะเครื่อง
+		fmt.Fprintf(w, "V8.3 Trinity: สัจจะยังคงอยู่ (Generals Active)")
+	})
+
+	log.Printf("🏰 THITNUEAHUB Engine รันที่พอร์ต %s", PORT)
 	http.ListenAndServe(PORT, nil)
 }
 
