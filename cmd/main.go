@@ -111,7 +111,7 @@ func worker(ctx context.Context, id int) {
 		case j := <-queue:
 			// L11 Balancer: ระบบวิเคราะห์การกระจายงาน
 			if j.Topic == "edge" {
-				log.Printf("[ขุนพล %d] ส่งต่องานไปสมรภูมิ Edge (V7 Curator)", id+1)
+				log.Printf("[ขุนพล %d] ส่งต่องานไปสมรภูมิ Edge (V5 Curator)", id+1)
 			} else {
 				log.Printf("[ขุนพล %d] ปฏิบัติภารกิจ: %s บนหัวข้อ %s", id+1, j.Action, j.Topic)
 			}
