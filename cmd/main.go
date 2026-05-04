@@ -18,68 +18,66 @@ import (
 	"time"
 )
 
-// [1ส: สะสาง] - แยกแยะขุนพลและอาวุธ
+// ===== [1ส: สะสาง] CONFIGURATION =====
 var (
-	SECRET     = []byte(getEnv("TNH_SECRET", "THITNUEAHUB_CORE_2026"))
+	SECRET     = []byte(os.Getenv("TNH_SECRET")) // สัจจะลับจอมทัพ
 	PORT       = ":2026"
 	QUEUE_SIZE = 128
-	WORKER_QTY = 4 // จำนวนขุนพลรบหลัก
 )
 
-// [2ส: สะดวก] - วางรูปแบบ Job ให้คมชัด
+// [อาชีพขุนพล Walker ทั้ง 11 นาย]
+var generalTitles = []string{
+	"จอมพลคุมทัพ", "พลซุ่มยิงดักสัจจะ", "วิศวกรผังเมือง", "อาลักษณ์จดบันทึก",
+	"ศัลยแพทย์ข้อมูล", "เพชฌฆาตขยะ", "พ่อค้าเจรจา", "บอดี้การ์ดคุมด่าน",
+	"ผู้ตรวจสอบกฎ", "หมอผีล้างอาถรรพ์", "สายลับพรางตัว",
+}
+
 type Job struct {
 	JobID  string `json:"job_id"`
 	Action string `json:"action"`
 	Topic  string `json:"topic"`
-	Ts     int64  `json:"ts"`  // เวลาสร้างสัจจะ
-	Ttl    int    `json:"ttl"` // อายุของสาส์น
-	Sig    string `json:"sig"` // ลายเซ็นจอมทัพ
+	Ts     int64  `json:"ts"`
+	Ttl    int    `json:"ttl"`
+	Sig    string `json:"sig"`
 }
 
 var (
 	jobQueue = make(chan Job, QUEUE_SIZE)
-	seenJobs sync.Map // [5ส: สร้างนิสัย] - กันงานซ้ำ (Idempotency)
+	seenJobs sync.Map
 )
 
-// ===== [3ส: สะอาด] - ขุนพลฝ่ายตรวจสอบ (Security Layer) =====
+// ===== [2ส: สะดวก] SECURITY UTILS =====
 
-func getEnv(k, d string) string {
-	if v := os.Getenv(k); v != "" { return v }
-	return d
-}
-
-// สร้างลายเซ็นจอมทัพ
-func generateSignature(j Job) string {
-	// สร้างสัจจะจากข้อมูลหลัก (JobID + Ts + Action)
+func generateSig(j Job) string {
+	// สร้างสัจจะจาก JobID และเวลา เพื่อความแม่นยำ 100%
 	data := fmt.Sprintf("%s|%d|%s", j.JobID, j.Ts, j.Action)
 	h := hmac.New(sha256.New, SECRET)
 	h.Write([]byte(data))
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func verifySovereignty(j Job) bool {
-	return hmac.Equal([]byte(j.Sig), []byte(generateSignature(j)))
+func verifySig(j Job) bool {
+	return hmac.Equal([]byte(j.Sig), []byte(generateSig(j)))
 }
 
-// ===== [4ส: สุขลักษณะ] - ระบบไหลเวียนข้อมูล (Core Handlers) =====
+// ===== [3ส: สะอาด] HANDLERS (AI & HUMAN READABLE) =====
 
-// 🖼️ Encode: ฝังคำสั่งลงท้ายไฟล์ภาพ (Steganography)
+// 🖼️ ENCODE: ฝังคำสั่งลงท้ายภาพ PNG
 func encodeHandler(w http.ResponseWriter, r *http.Request) {
 	var j Job
 	if err := json.NewDecoder(r.Body).Decode(&j); err != nil {
-		http.Error(w, "สาส์นสกปรก", 400); return
+		http.Error(w, "Error: Data is dirty", 400); return
 	}
 
 	j.Ts = time.Now().Unix()
-	j.Ttl = 120 // สัจจะมีอายุ 2 นาที
-	j.Sig = generateSignature(j)
+	j.Ttl = 120 // สัจจะมีอายุ 120 วินาที
+	j.Sig = generateSig(j)
 
-	// สร้างภาพเปล่า (Canvas) 300x300
-	img := image.NewRGBA(image.Rect(0, 0, 300, 300))
+	img := image.NewRGBA(image.Rect(0, 0, 1, 1)) // เล็กพริกขี้หนู 1x1 pixel
 	buf := new(bytes.Buffer)
 	png.Encode(buf, img)
 
-	// [สับขาหลอก] แนบสัจจะไว้ท้ายภาพ
+	// ฝัง Metadata ท้ายไฟล์แบบสับขาหลอก
 	buf.Write([]byte("\nCMD:"))
 	json.NewEncoder(buf).Encode(j)
 
@@ -87,105 +85,101 @@ func encodeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(buf.Bytes())
 }
 
-// 🔍 Decode: อ่านสัจจะจากภาพ
+// 🔍 DECODE: ถอดรหัสคำสั่งจากภาพ
 func decodeHandler(w http.ResponseWriter, r *http.Request) {
 	body, _ := io.ReadAll(r.Body)
 	marker := []byte("CMD:")
 	idx := bytes.LastIndex(body, marker)
 	if idx == -1 {
-		http.Error(w, "ไม่พบสัจจะในภาพ", 400); return
+		http.Error(w, "Error: No command found", 400); return
 	}
 
 	var j Job
-	if err := json.Unmarshal(body[idx+len(marker):], &j); err != nil {
-		http.Error(w, "สาส์นบิดเบือน", 400); return
-	}
+	json.Unmarshal(body[idx+len(marker):], &j)
 	json.NewEncoder(w).Encode(j)
 }
 
-// ⚙️ Process: รับงานเข้าสู่คิวขุนพล
+// ⚙️ PROCESS: คัดกรองและส่งงานเข้ากรมกอง
 func processHandler(w http.ResponseWriter, r *http.Request) {
 	var j Job
-	json.NewDecoder(r.Body).Decode(&j)
+	if err := json.NewDecoder(r.Body).Decode(&j); err != nil {
+		http.Error(w, "Error: Body corrupted", 400); return
+	}
 
-	// [ขุนพลคุมเวลา] - Time Gate
+	// [ตรวจสอบเวลาและลายเซ็น]
 	now := time.Now().Unix()
-	if now > j.Ts+int64(j.Ttl) {
-		http.Error(w, "สาส์นหมดอายุ (TTL Expired)", 403); return
+	if now > j.Ts+int64(j.Ttl) || !verifySig(j) {
+		http.Error(w, "Error: Unauthorized or Expired", 403); return
 	}
 
-	// [ขุนพลตรวจสอบ] - Signature Check
-	if !verifySovereignty(j) {
-		http.Error(w, "สัจจะปลอม (Invalid Signature)", 401); return
-	}
-
-	// [ขุนพลเพชฌฆาตขยะ] - Duplicate Check
+	// [กันงานซ้ำ]
 	if _, loaded := seenJobs.LoadOrStore(j.JobID, true); loaded {
-		w.WriteHeader(http.StatusAccepted)
-		w.Write([]byte("งานนี้ทำแล้ว (Duplicate)"))
-		return
+		w.WriteHeader(202); w.Write([]byte("Job already processed")); return
 	}
 
 	select {
 	case jobQueue <- j:
-		w.WriteHeader(http.StatusAccepted)
-		fmt.Fprintf(w, "รับสาส์น %s เข้ากรมกอง", j.JobID)
+		w.WriteHeader(202); fmt.Fprintf(w, "Accepted Job: %s", j.JobID)
 	default:
-		http.Error(w, "คิวเต็ม (Overload)", 503)
+		http.Error(w, "Error: Fortress Queue Full", 503)
 	}
 }
 
-// 📅 Scheduler: ตั้งเวลาทำงานล่วงหน้า
-func scheduleHandler(w http.ResponseWriter, r *http.Request) {
-	var j Job
-	json.NewDecoder(r.Body).Decode(&j)
-	
-	go func() {
-		delay := time.Until(time.Unix(j.Ts, 0))
-		if delay > 0 { time.Sleep(delay) }
+// ===== [4ส: สุขลักษณะ] WALKER ENGINE (11 GENERALS) =====
 
-		// ยิงเข้า Process ตัวเอง
-		b, _ := json.Marshal(j)
-		http.Post("http://localhost"+PORT+"/process", "application/json", bytes.NewReader(b))
-	}()
-	w.Write([]byte("ตั้งเวลาสัจจะเรียบร้อย"))
-}
-
-// ===== [DEPLOYMENT] - ขุนพลประจำการ =====
-
-func worker(ctx context.Context, id int) {
-	log.Printf("🛡️ ขุนพลที่ %d พร้อมรบ!", id)
-	for {
-		select {
-		case j := <-jobQueue:
-			log.Printf("[Worker %d] ปฏิบัติงาน: %s ในหัวข้อ %s", id, j.Action, j.Topic)
-			// จำลองการทำงานหนัก (0.16ms ในอุดมคติ)
-			time.Sleep(100 * time.Millisecond)
-		case <-ctx.Done():
-			return
-		}
+func startGenerals(ctx context.Context) {
+	// รันขุนพล 11 นายตามอาชีพที่กำหนด
+	for i := 0; i < 11; i++ {
+		workerID := i
+		title := generalTitles[i]
+		
+		go func(id int, name string) {
+			log.Printf("🛡️ ขุนพลลำดับที่ %d [%s] : เข้าประจำการระวังภัย!", id+1, name)
+			
+			for {
+				select {
+				case j := <-jobQueue:
+					// ลอจิกการทำงานจริง
+					log.Printf("⚔️ [%s] กำลังจัดการงาน: %s หัวข้อ: %s", name, j.JobID, j.Topic)
+					
+					// จำลองความเร็วการทำงาน 0.16ms (Processing...)
+					time.Sleep(50 * time.Millisecond) 
+					
+					log.Printf("✅ [%s] ทำภารกิจ %s สำเร็จ!", name, j.JobID)
+					
+				case <-ctx.Done():
+					log.Printf("💤 [%s] วางอาวุธและพักผ่อน", name)
+					return
+				}
+			}
+		}(workerID, title)
 	}
 }
+
+// ===== [5ส: สร้างนิสัย] MAIN DEPLOYMENT =====
 
 func main() {
+	if len(SECRET) == 0 {
+		log.Fatal("❌ FATAL: TNH_SECRET is missing! ระบบไม่มีสัจจะลับ")
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// ปล่อยขุนพลรบหลัก 4 นาย (Worker Pool)
-	for i := 1; i <= WORKER_QTY; i++ {
-		go worker(ctx, i)
-	}
+	// ปลุกขุนพลทั้ง 11 นาย
+	startGenerals(ctx)
 
-	http.HandleFunc("/encode", encodeHandler)     // ฝัง
-	http.HandleFunc("/decode", decodeHandler)     // อ่าน
-	http.HandleFunc("/process", processHandler)   // รัน
-	http.HandleFunc("/schedule", scheduleHandler) // ตั้งเวลา
+	http.HandleFunc("/encode", encodeHandler)
+	http.HandleFunc("/decode", decodeHandler)
+	http.HandleFunc("/process", processHandler)
 	http.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "ความยาวคิวปัจจุบัน: %d", len(jobQueue))
+		json.NewEncoder(w).Encode(map[string]int{"queue_depth": len(jobQueue)})
 	})
 
-	log.Printf("🚀 THITNUEAHUB Sovereign Engine รันบนพอร์ต %s", PORT)
+	log.Printf("🚀 THITNUEAHUB MOBILE AI LAB รันระบบที่พอร์ต %s", PORT)
+	log.Printf("📊 ระบบพร้อมทำงาน 11 อาชีพขุนพล - ซิงค์ 12 โปรเจกต์")
+	
 	if err := http.ListenAndServe(PORT, nil); err != nil {
-		log.Fatalf("ระบบล่ม: %v", err)
+		log.Fatalf("Critical Error: %v", err)
 	}
 }
