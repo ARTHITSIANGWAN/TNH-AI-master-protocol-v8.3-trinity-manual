@@ -1,12 +1,10 @@
 {
-  "name": "TNH-AI-V8.3-TRINITY-EMPIRE",
+  "name": "tnh-ai-v83-trinity-empire",
   "main": "src/index.ts",
   "compatibility_date": "2026-05-05",
   "observability": {
     "enabled": true
   },
-
-  "// 🧠 กล่องดวงใจ (D1 Database)": "อ้างอิงจากรูป 13726",
   "d1_databases": [
     {
       "binding": "DB",
@@ -14,26 +12,19 @@
       "database_id": "6926955e-a61f-4903-b09e-76e93e62df94"
     }
   ],
-
-  "// 📦 คลังแสง (R2 Bucket)": "อ้างอิงจากรูป 13726",
   "r2_buckets": [
     {
       "binding": "THN_R2",
       "bucket_name": "thitnueahub-assets"
     }
   ],
-
-  "// ⚡ สมุดจดไว (KV Namespace)": "อ้างอิงจากรูป 13732",
   "kv_namespaces": [
     {
       "binding": "TNH_KV",
-      "id": "2fa0a4773efa4a18b1534274d238dd76" 
+      "id": "2fa0a4773efa4a18b1534274d238dd76"
     }
   ],
-
-  "// 🤖 สมองกล AI (Workers AI)": "อ้างอิงจากหน้า Models 2026",
   "ai": {
     "binding": "AI"
   }
 }
-
