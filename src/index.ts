@@ -1,19 +1,22 @@
 export default {
   async fetch(request, env, ctx) {
-    // ใช้ TNH_KV แทน KV เฉยๆ เพื่อความกริบ
-    await env.TNH_KV.put('STATUS', 'MISSION_START_11:55');
-    
-    const value = await env.TNH_KV.get('STATUS');
-    const allKeys = await env.TNH_KV.list();
+    // 1. ทดสอบบันทึกสติลง KV
+    await env.TNH_KV.put('LAST_BOOT', new Date().toISOString());
+
+    // 2. ทดสอบดึงข้อมูลจากสมอง D1
+    const { results } = await env.DB.prepare("SELECT name FROM sqlite_master LIMIT 1").all();
+
+    // 3. เตรียมเรียกใช้ AI (สมมติใช้ GPT-5.5 รุ่นใหม่)
+    // const aiResponse = await env.AI.run('@cf/openai/gpt-5.5', { prompt: "Hello Trinity!" });
 
     return new Response(
       JSON.stringify({
-        project: "TNH-AI-V8.3",
-        status: value,
-        allKeys: allKeys,
+        status: "TNH-AI-V8.3-ONLINE",
+        message: "อาณาจักร 9THERA พร้อมรบ!",
+        kv_check: await env.TNH_KV.get('LAST_BOOT'),
+        db_ready: !!results
       }),
       { headers: { "Content-Type": "application/json" } }
     );
-  } 
-}
-
+  }
+};
