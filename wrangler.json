@@ -1,5 +1,5 @@
 {
-  "name": "spring-grass-6c1b",
+  "name": "TNH-AI-V8.3-TRINITY-EMPIRE",
   "main": "cmd/main.go",
   "compatibility_date": "2026-05-04",
   "account_id": "58533a0fa29f04212ceb5c0a018e3412",
@@ -9,7 +9,7 @@
   "d1_databases": [
     {
       "binding": "DB", 
-      "database_name": "TNH_BLACKBOX_DB",
+      "database_name": "spring-grass-6c1b",
       "database_id": "7ecf5e34-e645-58aa-9f43-c3f0eda0cf7e" 
     }
   ],
