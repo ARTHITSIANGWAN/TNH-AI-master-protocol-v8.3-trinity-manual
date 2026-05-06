@@ -1,5 +1,5 @@
 {
-  "name": "TNH-AI-v8.3-trinity-empire",
+  "name": "tnh-ai-v83-trinity-empire",
   "main": "src/index.ts",
   "compatibility_date": "2026-05-05",
   "observability": {
