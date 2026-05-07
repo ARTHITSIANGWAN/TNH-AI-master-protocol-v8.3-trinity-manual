@@ -1,4 +1,4 @@
-# 🔥 THITNUEA HUB | TNH-AI-V83 TRINITY EMPIRE
+# 🔥 THITNUEA HUB | TNH AI V83 TRINITY EMPIRE
 
 > **"Happiness is the foundation. Freedom is the ultimate goal."**
 
@@ -6,7 +6,7 @@
 
 ---
 
-## 🛡️ SYSTEM ARCHITECTURE: TNH-V8.3-TRINITY-EMPIRE
+## 🛡️ SYSTEM ARCHITECTURE: TNH AI V83 TRINITY EMPIRE
 
 | **ENGINE**       | **ARCH**       | **ZERO-GARBAGE**     | **SECURITY**       | **DARK-RELAY**     | **LATENCY**    |
 |------------------|----------------|----------------------|--------------------|--------------------|----------------|
@@ -66,5 +66,5 @@
 
 ---
 
-**Developed by THITNUEA ADMIN | V8.3 TRINITY ARCHITECT**  
+**Developed by THITNUEA ADMIN | TNH AI V83 TRINITY ARCHITECT**  
 *Zero-Garbage • Maximum Security • Lightning Freedom*
