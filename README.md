@@ -66,5 +66,5 @@
 
 ---
 
-**Developed by THITNUEA ADMIN | TNH AI V83 TRINITY ARCHITECT**  
+**Developed by THITNUEA ADMIN | TNH AI V8.3 TRINITY ARCHITECT**  
 *Zero-Garbage • Maximum Security • Lightning Freedom*
