@@ -11,7 +11,7 @@ export default {
 
     return new Response(
       JSON.stringify({
-        status: "TNH-AI-V8.3-ONLINE",
+        status: "TNH-AI-V83-ONLINE",
         message: "อาณาจักร 9THERA พร้อมรบ!",
         kv_check: await env.TNH_KV.get('LAST_BOOT'),
         db_ready: !!results
