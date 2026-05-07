@@ -1,4 +1,4 @@
-# 🔥 THITNUEA HUB | TNH-V8.3 TRINITY EMPIRE
+# 🔥 THITNUEA HUB | TNH-AI-V83 TRINITY EMPIRE
 
 > **"Happiness is the foundation. Freedom is the ultimate goal."**
 
