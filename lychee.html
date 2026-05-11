@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThitNueaHub - Lychee Campaign</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
+        body { font-family: 'Kanit', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 p-4">
+    <div class="max-w-md mx-auto bg-white rounded-3xl shadow-xl overflow-hidden p-6 border border-gray-100">
+        <h1 class="text-2xl font-bold text-red-600 mb-2">🍒 จัดการโพสต์ลิ้นจี่</h1>
+        <p class="text-gray-500 text-sm mb-6">แก้ไขข้อมูลด้านล่าง แล้วกดก๊อปปี้ไปโพสต์ได้เลย!</p>
+
+        <!-- ส่วนแก้ไขข้อมูล -->
+        <div class="space-y-4 mb-6">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700">💰 ราคา/โปรโมชั่น (แก้ไขได้)</label>
+                <input type="text" id="price" value="กิโลละ 150.- (3 กิโล 400.-)" 
+                    class="w-full p-3 mt-1 bg-red-50 border border-red-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700">📞 เบอร์โทร/ไลน์</label>
+                <input type="text" id="contact" value="08x-xxx-xxxx" 
+                    class="w-full p-3 mt-1 bg-red-50 border border-red-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400">
+            </div>
+        </div>
+
+        <hr class="mb-6">
+
+        <!-- ปุ่มกด -->
+        <div class="grid grid-cols-1 gap-3">
+            <button onclick="copyCaption('local')" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all text-lg">
+                📋 ก๊อปปี้แคปชั่น (ภาษาเหนือ)
+            </button>
+            <button onclick="copyCaption('organic')" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all text-lg">
+                📋 ก๊อปปี้แคปชั่น (เน้นสุขภาพ)
+            </button>
+        </div>
+
+        <p id="status" class="text-center text-sm mt-4 text-green-600 font-bold hidden">✅ ก๊อปปี้แล้ว! เตรียมวางได้เลย</p>
+
+        <!-- ส่วนของรูปภาพ -->
+        <div class="mt-8">
+            <label class="block text-sm font-semibold text-gray-700 mb-3">📸 รูปภาพ (กดค้างที่รูปเพื่อบันทึก)</label>
+            <div class="grid grid-cols-2 gap-2">
+                <img src="https://your-domain.com/assets/13887.png" class="rounded-xl border border-gray-200" alt="ลิ้นจี่ 1">
+                <img src="https://your-domain.com/assets/13885.png" class="rounded-xl border border-gray-200" alt="ลิ้นจี่ 2">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyCaption(type) {
+            const price = document.getElementById('price').value;
+            const contact = document.getElementById('contact').value;
+            let text = "";
+
+            if (type === 'local') {
+                text = `🍒 "รับลิ้นจี่หวานๆ ก่อเจ้า? ลำแต้ลำว่าเน้อ!"\n\nลิ้นจี่สดๆ จากสวน คัดเองกับมือทุกลูก ปลอดสารพิษแต้ๆ เจ้า เนื้อฟู น้ำนักหวานจื่นใจ๋สุดๆ\n\n🔥 โปรโมชั่น: ${price}\n📍 สนใจทักแชทหรือโทร: ${contact}\n\nเปิ้นพร้อมส่งความหวานถึงหน้าบ้านเลยจ้าววว 🛵✨`;
+            } else {
+                text = `🌳 100% ORGANIC สดจากต้น หวานฉ่ำจากธรรมชาติ!\n\nลิ้นจี่เนื้อแน่น น้ำเยอะ ปลูกด้วยวิถีธรรมชาติ ปลอดสารเคมี คัดเกรดพรีเมียมเน้นๆ\n\n💰 ราคา: ${price}\n📞 สั่งซื้อได้ที่: ${contact}\n\nสนับสนุนเกษตรกรท้องถิ่น ได้สุขภาพดี ได้ของอร่อย! ออเดอร์เลยก่อนหมดสวนนะคะ! 🍒✨`;
+            }
+
+            // คัดลอกลง Clipboard
+            navigator.clipboard.writeText(text).then(() => {
+                const status = document.getElementById('status');
+                status.classList.remove('hidden');
+                setTimeout(() => { status.classList.add('hidden'); }, 2000);
+                
+                // หลังจาก 1 วิ ให้เปิด Facebook (Optional)
+                setTimeout(() => {
+                    window.location.href = "fb://facewebmodal/f?href=https://www.facebook.com";
+                }, 1000);
+            });
+        }
+    </script>
+</body>
+</html>
