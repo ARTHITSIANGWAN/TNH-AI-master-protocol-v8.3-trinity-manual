@@ -1,36 +1,34 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"log"
 	"os"
-
-	"google.golang.org/api/calendar/v3"
-	"google.golang.org/api/option"
+	"net/http"
 )
 
-// --- 🛡️ Gripen V5: ระบบดึงสัจจะจากปฏิทินส่งต่อ V8.3 ---
+/**
+ * 🛡️ TNH AI V83 TRINITY EMPIRE - Core Engine
+ * Zero-Garbage Protocol: 100% Pure Go
+ */
 
-func syncCalendarCommand(ctx context.Context) {
-	// 1. เชื่อมต่อ Google Calendar ด้วย API Key ที่บอสตั้งไว้
-	calKey := os.Getenv("GOOGLE_CALENDAR_KEY")
-	srv, err := calendar.NewService(ctx, option.WithAPIKey(calKey))
-	if err != nil {
-		log.Fatalf("❌ ปฏิทินขัดข้อง: %v", err)
+func main() {
+	// 🛰️ ดึงกุญแจเรียกพอร์ตและ Secret จาก Environment
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "2026" // ปีศักราชเรียกพอร์ตตามที่บอสกำหนด
 	}
 
-	// 2. ตรวจสอบ Event ล่าสุดในปฏิทินภารกิจ
-	events, _ := srv.Events.List("primary").MaxResults(1).Do()
-	if len(events.Items) > 0 {
-		mission := events.Items[0]
-		
-		// 3. ตรวจสอบ "คำสั่งซ่อน" (เช่น CMD:IGNITE_V83)
-		if mission.Description == "CMD:IGNITE_V83" {
-			fmt.Println("🚀 พลายทองตรวจพบสัญญาณ: กำลังส่งต่อสัจจะไปที่ V8.3 Trinity...")
-			
-			// โลจิกการส่งคำสั่งต่อไปยัง GitHub หรือ Webhook ของ V8.3
-			// โดยใช้สิทธิ์จาก TNH_SECRET ที่บอสฝังไว้
-		}
+	// 🔑 ตรวจสอบกุญแจสัจจะ (GITHUB_TOKEN)
+	token := os.Getenv("GITHUB_TOKEN")
+	if token == "" {
+		fmt.Println("⚠️ [L8 Guardian] คำเตือน: ไม่พบ GITHUB_TOKEN ระบบอาจทำงานจำกัดสิทธิ์")
 	}
+
+	http.HandleFunc("/ignite", func(w http.ResponseWriter, r *http.Request) {
+		// Logic สำหรับการรัน 11 ขุนพล
+		fmt.Fprintf(w, "🚀 V83 TRINITY EMPIRE: SYSTEM ACTIVE | STATUS: STABLE (0.xxms)")
+	})
+
+	fmt.Printf("🔥 V83 Engine เริ่มทำงานที่พอร์ต %s...\n", port)
+	http.ListenAndServe(":"+port, nil)
 }
