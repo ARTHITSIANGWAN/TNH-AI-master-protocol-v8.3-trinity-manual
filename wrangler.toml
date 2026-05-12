@@ -1,0 +1,32 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "tnh-ai-v83-trinity-empire"
+main = "src/index.ts" # หรือเปลี่ยนเป็นทางเดินไปยังไฟล์หลักของบอส
+compatibility_date = "2026-05-06"
+compatibility_flags = [ "nodejs_compat" ]
+
+# 1. การตั้งค่าฐานข้อมูล D1 (ใช้ ID ที่ถูกต้องจากหน้าจอ)
+[[d1_databases]]
+binding = "DB" 
+database_name = "thitnueahub-core-db"
+database_id = "6a8b4373-bf40-4b63-bb02-f612ecbe63b7"
+
+# 2. การเชื่อมต่อ R2 สำหรับเก็บรูปภาพที่มี Layer โค้ด
+[[r2_buckets]]
+binding = "TNH_R2"
+bucket_name = "thitnueahub-assets"
+
+# 3. การเชื่อมต่อ KV สำหรับเก็บสถานะ Calendar และการทำ Load Balancing
+[[kv_namespaces]]
+binding = "TNH_KV"
+id = "2fa0a4773efa4a18b1534274d238dd76"
+
+# 4. ตั้งค่า AI สำหรับประมวลผลคำสั่ง
+[ai]
+binding = "AI"
+
+# 5. ส่วนการตั้งค่าสำหรับ Load Balancing (ตัวอย่างการแยก Env)
+[env.production]
+name = "tnh-ai-v83-trinity-empire-prod"
+
+[env.staging]
+name = "tnh-ai-v83-trinity-empire-staging"
