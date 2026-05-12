@@ -2,7 +2,7 @@
 
 > **"Happiness is the foundation. Freedom is the ultimate goal."**
 
-![V8.3 Empire Banner](assets/v8.3-banner.png)
+![V83 Empire Banner](assets/v83-banner.png)
 
 ---
 
@@ -10,7 +10,7 @@
 
 | **ENGINE**       | **ARCH**       | **ZERO-GARBAGE**     | **SECURITY**       | **DARK-RELAY**     | **LATENCY**    |
 |------------------|----------------|----------------------|--------------------|--------------------|----------------|
-| 🔴 **V8.3**      | 🟢 **Trinity** | 🟡 **Pure Go**       | 🔵 **HMAC-SHA256** | 🟣 **Stegano**     | 🟠 **0.16ms**  |
+| 🔴 **V83**      | 🟢 **Trinity** | 🟡 **Pure Go**       | 🔵 **HMAC-SHA256** | 🟣 **Stegano**     | 🟠 **0.xxms**  |
 
 ---
 
@@ -66,7 +66,7 @@
 
 ---
 
-**Developed by THITNUEA ADMIN | TNH AI V8.3 TRINITY ARCHITECT**  
+**Developed by THITNUEA ADMIN | TNH AI V83 TRINITY ARCHITECT**  
 *Zero-Garbage • Maximum Security • Lightning Freedom*
 
 # ปลุกมหาจักรวรรดิให้ตื่นขึ้น
