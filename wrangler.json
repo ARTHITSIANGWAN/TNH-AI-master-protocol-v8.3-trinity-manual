@@ -1,42 +1,27 @@
 {
-  "name": "tnh-ai-v83-trinity-empire",
+  "name": "tnh-ai-v83-trinity-empire", // ปรับให้ตรงกับโปรเจกต์หลัก
   "main": "src/index.ts",
-  "compatibility_date": "2026-05-05",
-  "observability": {
-    "enabled": true,
-    "head_sampling_rate": 1,
-    "logs": {
-      "enabled": true,
-      "head_sampling_rate": 1,
-      "persist": true,
-      "invocation_logs": true
-    },
-    "traces": {
-      "enabled": false,
-      "persist": true,
-      "head_sampling_rate": 1
+  "compatibility_date": "2026-05-06",
+  "compatibility_flags": [ "nodejs_compat" ], // เพิ่มความสามารถในการประมวลผล Layer
+  "kv_namespaces": [
+    { 
+      "binding": "TNH_KV", 
+      "id": "2fa0a4773efa4a18b1534274d238dd76" 
     }
-  },
+  ],
   "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "thitnueahub-core-db",
-      "database_id": "6926955e-a61f-4903-b09e-76e93e62df94"
+    { 
+      "binding": "DB", 
+      "database_id": "6a8b4373-bf40-4b63-bb02-f612ecbe63b7" // แก้ไข ID ให้ตรงกับฐานข้อมูลจริง
     }
   ],
   "r2_buckets": [
-    {
-      "binding": "TNH_R2",
-      "bucket_name": "thitnueahub-assets"
+    { 
+      "binding": "TNH_R2", 
+      "bucket_name": "thitnueahub-assets" 
     }
   ],
-  "kv_namespaces": [
-    {
-      "binding": "TNH_KV",
-      "id": "2fa0a4773efa4a18b1534274d238dd76"
-    }
-  ],
-  "ai": {
-    "binding": "AI"
+  "triggers": {
+    "crons": ["0 0 */3 * *"] // ทำงานอัตโนมัติทุก 3 วันตามสถาปัตยกรรม V1
   }
 }
