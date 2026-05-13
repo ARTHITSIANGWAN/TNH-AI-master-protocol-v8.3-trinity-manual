@@ -1,5 +1,5 @@
 #:schema node_modules/wrangler/config-schema.json
-name = "tnh-ai-v83-trinity-empire"
+name = "v83empire"
 main = "src/index.ts" # หรือเปลี่ยนเป็นทางเดินไปยังไฟล์หลักของบอส
 compatibility_date = "2026-05-06"
 compatibility_flags = [ "nodejs_compat" ]
