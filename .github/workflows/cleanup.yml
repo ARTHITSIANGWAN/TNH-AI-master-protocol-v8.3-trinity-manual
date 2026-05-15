@@ -1,0 +1,30 @@
+name: TNH_AI_V83_CLEANUP_MISSION
+on: [workflow_dispatch] # บอสกดสั่งงานเองจากมือได้เลยก้า
+
+jobs:
+  jod_cleaner_task:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛡️ Step 1: Checkout 11-General Core
+        uses: actions/checkout@v4
+
+      - name: 👾 Step 2: ไอ้จ๊อดล้างขยะและย้ายไฟล์
+        run: |
+          echo "ไอ้จ๊อดมาแล้วโว้ยฯ กำลังย้ายของ..."
+          # ตรวจสอบว่ามีไฟล์หลงยุคไหม
+          mkdir -p assets/rainbow/  # สร้างที่อยู่ใหม่ให้สายรุ้ง
+          
+          # ท่าไม้ตายไอ้จ๊อด: ย้ายทุกอย่างที่ขวางทาง Build
+          if [ -d "_site" ]; then rm -rf _site; fi
+          
+          # ย้ายไฟล์จากจุด A ไป B (บอสเปลี่ยนชื่อไฟล์ตรงนี้ได้ก้า)
+          # mv source_file assets/rainbow/ 
+
+      - name: ✅ Step 3: บันทึกสัจจะลงมหาจักรวรรดิ
+        run: |
+          git config --global user.name "TNH-AI-JOD-L5"
+          git config --global user.email "jod@tnh.ai"
+          git add .
+          git commit -m "L5: ล้างป่าช้าและจัดระเบียบ Assets เรียบร้อยก้าบอส! 🤫" || echo "ไม่มีอะไรให้ย้ายก้า"
+          git push
+          
