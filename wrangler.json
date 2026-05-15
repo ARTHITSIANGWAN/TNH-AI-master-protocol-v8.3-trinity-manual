@@ -1,5 +1,5 @@
 {
-  "name": "v83empire", // ปรับให้ตรงกับโปรเจกต์หลัก
+  "name": "tnh-ai-v83-trinity-empire", // ปรับให้ตรงกับโปรเจกต์หลัก
   "main": "src/index.ts",
   "compatibility_date": "2026-05-06",
   "compatibility_flags": [ "nodejs_compat" ], // เพิ่มความสามารถในการประมวลผล Layer
